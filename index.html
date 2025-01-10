@@ -14,12 +14,6 @@
     <div class="container py-5">
         <h1 class="text-center">Storm Ticket Management</h1>
 
-        <!-- Login Section -->
-        <div id="login-section" class="mt-4">
-            <h3>Login</h3>
-            <button id="login-button" class="btn btn-primary">Login Anonymously</button>
-        </div>
-
         <!-- Dashboard Section -->
         <div id="dashboard-section" class="mt-5" style="display: none;">
             <h3>User Dashboard</h3>
@@ -61,19 +55,16 @@
         const db = firebase.firestore();
 
         // HTML Elements
-        const loginSection = document.getElementById("login-section");
         const dashboardSection = document.getElementById("dashboard-section");
-        const loginButton = document.getElementById("login-button");
         const logoutButton = document.getElementById("logout-button");
         const ticketForm = document.getElementById("ticket-form");
         const ticketList = document.getElementById("ticket-list");
 
-        // Anonymous Login
-        loginButton.addEventListener("click", async () => {
+        // Automatic Anonymous Login
+        window.addEventListener("load", async () => {
             try {
                 const userCredential = await auth.signInAnonymously();
                 console.log("Logged in anonymously:", userCredential.user);
-                loginSection.style.display = "none";
                 dashboardSection.style.display = "block";
                 loadTickets();
             } catch (error) {
@@ -85,8 +76,7 @@
         // Logout
         logoutButton.addEventListener("click", () => {
             auth.signOut();
-            loginSection.style.display = "block";
-            dashboardSection.style.display = "none";
+            location.reload(); // Refresh the page to trigger automatic login again
         });
 
         // Add Ticket
