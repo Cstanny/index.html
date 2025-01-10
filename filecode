@@ -1,24 +1,4 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAeXNZSCoe19NHdCazHwRYCNnX7RYARfV0",
-  authDomain: "stormtrack-e25c2.firebaseapp.com",
-  projectId: "stormtrack-e25c2",
-  storageBucket: "stormtrack-e25c2.firebasestorage.app",
-  messagingSenderId: "963058909171",
-  appId: "1:963058909171:web:7ca217f912f8e72adb1c86",
-  measurementId: "G-MNVDE3K8GJ"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -28,6 +8,7 @@ const analytics = getAnalytics(app);!DOCTYPE html>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-analytics.js"></script>
 </head>
 <body>
     <div class="container py-5">
@@ -71,18 +52,29 @@ const analytics = getAnalytics(app);!DOCTYPE html>
     </div>
 
     <script>
-        // Firebase Configuration
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "firebase/app";
+        import { getAnalytics } from "firebase/analytics";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAeXNZSCoe19NHdCazHwRYCNnX7RYARfV0",
+            authDomain: "stormtrack-e25c2.firebaseapp.com",
+            projectId: "stormtrack-e25c2",
+            storageBucket: "stormtrack-e25c2.firebasestorage.app",
+            messagingSenderId: "963058909171",
+            appId: "1:963058909171:web:7ca217f912f8e72adb1c86",
+            measurementId: "G-MNVDE3K8GJ"
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        // Firebase Authentication and Firestore Setup
         const auth = firebase.getAuth(app);
         const db = firebase.getFirestore(app);
 
