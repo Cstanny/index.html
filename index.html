@@ -87,17 +87,20 @@
         const logoutButton = document.getElementById("logout-button");
 
         // Login Functionality
-        loginForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            try {
-                await firebase.signInWithEmailAndPassword(auth, email, password);
-                loginSection.style.display = "none";
-                dashboardSection.style.display = "block";
-                loadTickets();
-            } catch (error) {
-                alert("Login failed: " + error.message);
+       loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    try {
+        await firebase.auth().signInWithEmailAndPassword(email, password); // Correct usage of Firebase Auth
+        loginSection.style.display = "none";
+        dashboardSection.style.display = "block";
+        loadTickets();
+    } catch (error) {
+        alert("Login failed: " + error.message); // Display meaningful error messages
+    }
+});
+
             }
         });
 
