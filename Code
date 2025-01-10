@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm Ticket Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="text-center">Storm Ticket Management</h1>
+
+        <div id="login-section" class="mt-4">
+            <h3>Login</h3>
+            <form id="login-form">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+
+        <div id="dashboard-section" class="mt-5" style="display: none;">
+            <h3>User Dashboard</h3>
+            <button id="logout-button" class="btn btn-danger mb-3">Logout</button>
+
+            <h4>Create Ticket</h4>
+            <form id="ticket-form">
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <input type="text" class="form-control" id="address" placeholder="Enter address">
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Work Description</label>
+                    <textarea class="form-control" id="description" rows="3" placeholder="Enter work description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Add Ticket</button>
+            </form>
+
+            <h4 class="mt-5">Assigned Tickets</h4>
+            <ul id="ticket-list" class="list-group"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.getAuth(app);
+        const db = firebase.getFirestore(app);
+
+        // HTML Elements
+        const loginSection = document.getElementById("login-section");
+        const dashboardSection = document.getElementById("dashboard-section");
+        const loginForm = document.getElementById("login-form");
+        const ticketForm = document.getElementById("ticket-form");
+        const ticketList = document.getElementById("ticket-list");
+        const logoutButton = document.getElementById("logout-button");
+
+        // Login Functionality
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            try {
+                await firebase.signInWithEmailAndPassword(auth, email, password);
+                loginSection.style.display = "none";
+                dashboardSection.style.display = "block";
+                loadTickets();
+            } catch (error) {
+                alert("Login failed: " + error.message);
+            }
+        });
+
+        // Logout Functionality
+        logoutButton.addEventListener("click", () => {
+            firebase.signOut(auth);
+            loginSection.style.display = "block";
+            dashboardSection.style.display = "none";
+        });
+
+        // Add Ticket
+        ticketForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const address = document.getElementById("address").value;
+            const description = document.getElementById("description").value;
+            try {
+                await firebase.addDoc(firebase.collection(db, "tickets"), {
+                    address,
+                    description,
+                    status: "Open",
+                    createdAt: firebase.serverTimestamp()
+                });
+                loadTickets();
+                ticketForm.reset();
+            } catch (error) {
+                alert("Failed to add ticket: " + error.message);
+            }
+        });
+
+        // Load Tickets
+        async function loadTickets() {
+            ticketList.innerHTML = "";
+            const querySnapshot = await firebase.getDocs(firebase.collection(db, "tickets"));
+            querySnapshot.forEach((doc) => {
+                const ticket = doc.data();
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center";
+                li.textContent = `${ticket.address}: ${ticket.description}`;
+                const completeButton = document.createElement("button");
+                completeButton.className = "btn btn-sm btn-success";
+                completeButton.textContent = "Complete";
+                completeButton.addEventListener("click", async () => {
+                    await firebase.updateDoc(firebase.doc(db, "tickets", doc.id), { status: "Completed", completedAt: firebase.serverTimestamp() });
+                    loadTickets();
+                });
+                li.appendChild(completeButton);
+                ticketList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
