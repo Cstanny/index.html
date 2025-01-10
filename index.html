@@ -14,21 +14,13 @@
     <div class="container py-5">
         <h1 class="text-center">Storm Ticket Management</h1>
 
+        <!-- Login Section -->
         <div id="login-section" class="mt-4">
             <h3>Login</h3>
-            <form id="login-form">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="Enter your email">
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter your password">
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
+            <button id="login-button" class="btn btn-primary">Login Anonymously</button>
         </div>
 
+        <!-- Dashboard Section -->
         <div id="dashboard-section" class="mt-5" style="display: none;">
             <h3>User Dashboard</h3>
             <button id="logout-button" class="btn btn-danger mb-3">Logout</button>
@@ -65,35 +57,32 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-
         const auth = firebase.auth();
         const db = firebase.firestore();
 
         // HTML Elements
         const loginSection = document.getElementById("login-section");
         const dashboardSection = document.getElementById("dashboard-section");
-        const loginForm = document.getElementById("login-form");
+        const loginButton = document.getElementById("login-button");
+        const logoutButton = document.getElementById("logout-button");
         const ticketForm = document.getElementById("ticket-form");
         const ticketList = document.getElementById("ticket-list");
-        const logoutButton = document.getElementById("logout-button");
 
-        // Login Functionality
-        loginForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+        // Anonymous Login
+        loginButton.addEventListener("click", async () => {
             try {
-                await auth.signInWithEmailAndPassword(email, password);
-                alert("Login successful!");
+                const userCredential = await auth.signInAnonymously();
+                console.log("Logged in anonymously:", userCredential.user);
                 loginSection.style.display = "none";
                 dashboardSection.style.display = "block";
                 loadTickets();
             } catch (error) {
+                console.error("Anonymous login failed:", error);
                 alert("Login failed: " + error.message);
             }
         });
 
-        // Logout Functionality
+        // Logout
         logoutButton.addEventListener("click", () => {
             auth.signOut();
             loginSection.style.display = "block";
@@ -132,7 +121,10 @@
                 completeButton.className = "btn btn-sm btn-success";
                 completeButton.textContent = "Complete";
                 completeButton.addEventListener("click", async () => {
-                    await db.collection("tickets").doc(doc.id).update({ status: "Completed", completedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    await db.collection("tickets").doc(doc.id).update({
+                        status: "Completed",
+                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                     loadTickets();
                 });
                 li.appendChild(completeButton);
