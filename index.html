@@ -6,7 +6,7 @@
     <title>Storm Ticket Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Firebase SDKs (Compatibility Versions) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore-compat.js"></script>
@@ -17,12 +17,16 @@
         <h1 class="text-center">Storm Ticket Management</h1>
 
         <!-- Dashboard Section -->
-        <div id="dashboard-section" class="mt-5" style="display: none;">
+        <div id="dashboard-section" class="mt-5">
             <h3>User Dashboard</h3>
             <button id="logout-button" class="btn btn-danger mb-3">Logout</button>
 
             <h4>Create Ticket</h4>
             <form id="ticket-form">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" placeholder="Enter assignee's name">
+                </div>
                 <div class="mb-3">
                     <label for="address" class="form-label">Address</label>
                     <input type="text" class="form-control" id="address" placeholder="Enter address">
@@ -84,48 +88,49 @@
         // Add Ticket
         ticketForm.addEventListener("submit", async (e) => {
             e.preventDefault();
+            const name = document.getElementById("name").value; // Capture the name
             const address = document.getElementById("address").value;
             const description = document.getElementById("description").value;
             try {
                 await db.collection("tickets").add({
+                    name, // Save the name
                     address,
                     description,
                     status: "Open",
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                loadTickets();
-                ticketForm.reset();
+                loadTickets(); // Reload the ticket list
+                ticketForm.reset(); // Clear the form
             } catch (error) {
                 alert("Failed to add ticket: " + error.message);
             }
         });
 
-       // Load Tickets
-async function loadTickets() {
-    ticketList.innerHTML = ""; // Clear the current list
-    const querySnapshot = await db.collection("tickets").get();
-    querySnapshot.forEach((doc) => {
-        const ticket = doc.data();
-        if (ticket.status !== "Completed") { // Only show tickets that are not completed
-            const li = document.createElement("li");
-            li.className = "list-group-item d-flex justify-content-between align-items-center";
-            li.textContent = `${ticket.address}: ${ticket.description}`;
-            const completeButton = document.createElement("button");
-            completeButton.className = "btn btn-sm btn-success";
-            completeButton.textContent = "Complete";
-            completeButton.addEventListener("click", async () => {
-                await db.collection("tickets").doc(doc.id).update({
-                    status: "Completed",
-                    completedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                loadTickets(); // Reload the tickets after updating
+        // Load Tickets
+        async function loadTickets() {
+            ticketList.innerHTML = "";
+            const querySnapshot = await db.collection("tickets").get();
+            querySnapshot.forEach((doc) => {
+                const ticket = doc.data();
+                if (ticket.status !== "Completed") { // Only show tickets that are not completed
+                    const li = document.createElement("li");
+                    li.className = "list-group-item d-flex justify-content-between align-items-center";
+                    li.textContent = `Name: ${ticket.name}, Address: ${ticket.address}, Work: ${ticket.description}`;
+                    const completeButton = document.createElement("button");
+                    completeButton.className = "btn btn-sm btn-success";
+                    completeButton.textContent = "Complete";
+                    completeButton.addEventListener("click", async () => {
+                        await db.collection("tickets").doc(doc.id).update({
+                            status: "Completed",
+                            completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        loadTickets();
+                    });
+                    li.appendChild(completeButton);
+                    ticketList.appendChild(li);
+                }
             });
-            li.appendChild(completeButton);
-            ticketList.appendChild(li);
         }
-    });
-}
-
     </script>
 </body>
 </html>
