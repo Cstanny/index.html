@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storm Ticket Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth-compat.js"></script>
@@ -15,6 +16,7 @@
     <div class="container py-5">
         <h1 class="text-center">Storm Ticket Management</h1>
 
+        <!-- Dashboard Section -->
         <div id="dashboard-section" class="mt-5">
             <h3>User Dashboard</h3>
             <button id="logout-button" class="btn btn-danger mb-3">Logout</button>
@@ -41,15 +43,17 @@
                 <button type="submit" class="btn btn-success">Add Ticket</button>
             </form>
 
+            <!-- Tickets -->
             <h4 class="mt-5">Assigned Tickets</h4>
             <ul id="ticket-list" class="list-group"></ul>
 
+            <!-- Completed Tickets -->
             <h4 class="mt-5">Completed Tickets</h4>
             <button id="download-completed-tickets" class="btn btn-primary mb-3">Download Completed Tickets (CSV)</button>
             <ul id="completed-ticket-list" class="list-group"></ul>
 
             <!-- Hotel Management -->
-            <h4 class="mt-5">Add Hotel Details</h4>
+            <h4 class="mt-5">Hotel Details</h4>
             <form id="hotel-form">
                 <div class="mb-3">
                     <label for="hotel-name" class="form-label">Hotel Name</label>
@@ -66,21 +70,20 @@
                 <button type="submit" class="btn btn-success">Add Hotel</button>
             </form>
 
-            <h4 class="mt-5">Hotel Details</h4>
-            <ul id="hotel-list" class="list-group"></ul>
+            <ul id="hotel-list" class="list-group mt-3"></ul>
         </div>
     </div>
 
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+            apiKey: "AIzaSyAeXNZSCoe19NHdCazHwRYCNnX7RYARfV0",
+            authDomain: "stormtrack-e25c2.firebaseapp.com",
+            projectId: "stormtrack-e25c2",
+            storageBucket: "stormtrack-e25c2.appspot.com",
+            messagingSenderId: "963058909171",
+            appId: "1:963058909171:web:7ca217f912f8e72adb1c86",
+            measurementId: "G-MNVDE3K8GJ"
         };
 
         // Initialize Firebase
@@ -89,11 +92,33 @@
         const db = firebase.firestore();
 
         // HTML Elements
+        const dashboardSection = document.getElementById("dashboard-section");
+        const logoutButton = document.getElementById("logout-button");
         const ticketForm = document.getElementById("ticket-form");
-        const hotelForm = document.getElementById("hotel-form");
         const ticketList = document.getElementById("ticket-list");
         const completedTicketList = document.getElementById("completed-ticket-list");
+        const downloadCompletedTicketsButton = document.getElementById("download-completed-tickets");
+        const hotelForm = document.getElementById("hotel-form");
         const hotelList = document.getElementById("hotel-list");
+
+        // Automatic Login
+        window.addEventListener("load", async () => {
+            try {
+                await auth.signInAnonymously();
+                dashboardSection.style.display = "block";
+                loadTickets();
+                loadCompletedTickets();
+                loadHotels();
+            } catch (error) {
+                alert("Login failed: " + error.message);
+            }
+        });
+
+        // Logout
+        logoutButton.addEventListener("click", () => {
+            auth.signOut();
+            location.reload();
+        });
 
         // Add Ticket
         ticketForm.addEventListener("submit", async (e) => {
@@ -102,7 +127,6 @@
             const address = document.getElementById("address").value;
             const description = document.getElementById("description").value;
             const etr = document.getElementById("etr").value;
-
             try {
                 await db.collection("tickets").add({
                     name,
@@ -110,6 +134,7 @@
                     description,
                     etr,
                     status: "Open",
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 loadTickets();
                 ticketForm.reset();
@@ -118,27 +143,7 @@
             }
         });
 
-        // Add Hotel
-        hotelForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const name = document.getElementById("hotel-name").value;
-            const address = document.getElementById("hotel-address").value;
-            const roomAssignment = document.getElementById("room-assignment").value;
-
-            try {
-                await db.collection("hotels").add({
-                    name,
-                    address,
-                    roomAssignment,
-                });
-                loadHotels();
-                hotelForm.reset();
-            } catch (error) {
-                alert("Failed to add hotel: " + error.message);
-            }
-        });
-
-        // Load Tickets
+        // Load Active Tickets
         async function loadTickets() {
             ticketList.innerHTML = "";
             const querySnapshot = await db.collection("tickets").where("status", "==", "Open").get();
@@ -146,14 +151,55 @@
                 const ticket = doc.data();
                 const li = document.createElement("li");
                 li.className = "list-group-item d-flex justify-content-between align-items-center";
-                li.innerHTML = `
-                    ${ticket.name} - ${ticket.address} - ${ticket.description} (ETR: ${ticket.etr})
-                    <a href="https://maps.apple.com/?q=${encodeURIComponent(ticket.address)}" target="_blank">Apple Maps</a> |
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ticket.address)}" target="_blank">Google Maps</a>
-                `;
+                li.innerHTML = `${ticket.name} - ${ticket.address} - ${ticket.description} (ETR: ${ticket.etr})
+                    <a href="https://maps.apple.com/?q=${encodeURIComponent(ticket.address)}" target="_blank">Apple Maps</a>
+                    | <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ticket.address)}" target="_blank">Google Maps</a>`;
+                const completeButton = document.createElement("button");
+                completeButton.className = "btn btn-sm btn-success";
+                completeButton.textContent = "Complete";
+                completeButton.addEventListener("click", async () => {
+                    await db.collection("tickets").doc(doc.id).update({
+                        status: "Completed",
+                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    loadTickets();
+                });
+                li.appendChild(completeButton);
                 ticketList.appendChild(li);
             });
         }
+
+        // Load Completed Tickets
+        async function loadCompletedTickets() {
+            completedTicketList.innerHTML = "";
+            const querySnapshot = await db.collection("tickets").where("status", "==", "Completed").get();
+            querySnapshot.forEach((doc) => {
+                const ticket = doc.data();
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = `${ticket.name} - ${ticket.address} - ${ticket.description} (Completed At: ${ticket.completedAt?.toDate()})`;
+                completedTicketList.appendChild(li);
+            });
+        }
+
+        // Add Hotel
+        hotelForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const hotelName = document.getElementById("hotel-name").value;
+            const hotelAddress = document.getElementById("hotel-address").value;
+            const roomAssignment = document.getElementById("room-assignment").value;
+            try {
+                await db.collection("hotels").add({
+                    name: hotelName,
+                    address: hotelAddress,
+                    roomAssignment
+                });
+                loadHotels();
+                hotelForm.reset();
+            } catch (error) {
+                alert("Failed to add hotel: " + error.message);
+            }
+        });
 
         // Load Hotels
         async function loadHotels() {
@@ -163,25 +209,35 @@
                 const hotel = doc.data();
                 const li = document.createElement("li");
                 li.className = "list-group-item";
-                li.innerHTML = `
-                    ${hotel.name} - ${hotel.address} - Room: ${hotel.roomAssignment}
-                    <a href="https://maps.apple.com/?q=${encodeURIComponent(hotel.address)}" target="_blank">Apple Maps</a> |
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.address)}" target="_blank">Google Maps</a>
-                `;
+                li.innerHTML = `${hotel.name} - ${hotel.address} - Room: ${hotel.roomAssignment}
+                    <a href="https://maps.apple.com/?q=${encodeURIComponent(hotel.address)}" target="_blank">Apple Maps</a>
+                    | <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.address)}" target="_blank">Google Maps</a>`;
                 hotelList.appendChild(li);
             });
         }
 
-        // Initialize page
-        window.addEventListener("load", async () => {
-            try {
-                await auth.signInAnonymously();
-                loadTickets();
-                loadHotels();
-            } catch (error) {
-                console.error("Error logging in:", error);
-                alert("Error logging in: " + error.message);
-            }
+        // Download Completed Tickets as CSV
+        downloadCompletedTicketsButton.addEventListener("click", async () => {
+            const querySnapshot = await db.collection("tickets").where("status", "==", "Completed").get();
+            const tickets = [];
+            querySnapshot.forEach((doc) => {
+                const ticket = doc.data();
+                tickets.push({
+                    name: ticket.name,
+                    address: ticket.address,
+                    description: ticket.description,
+                    completedAt: ticket.completedAt?.toDate()
+                });
+            });
+            const csvContent = "data:text/csv;charset=utf-8," +
+                tickets.map(ticket => Object.values(ticket).join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "completed_tickets.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
     </script>
 </body>
