@@ -64,11 +64,12 @@
                     <input type="text" class="form-control" id="hotel-address" placeholder="Enter hotel address" required>
                 </div>
                 <div class="mb-3">
-                    <label for="hotel-room" class="form-label">Room Assignment</label>
-                    <input type="text" class="form-control" id="hotel-room" placeholder="Enter room assignment" required>
+                    <label for="room-assignment" class="form-label">Room Assignment</label>
+                    <input type="text" class="form-control" id="room-assignment" placeholder="Enter room assignment" required>
                 </div>
                 <button type="submit" class="btn btn-success">Add Hotel</button>
             </form>
+
             <h4 class="mt-5">Hotel Details</h4>
             <ul id="hotel-list" class="list-group"></ul>
         </div>
@@ -101,7 +102,7 @@
         const hotelForm = document.getElementById("hotel-form");
         const hotelList = document.getElementById("hotel-list");
 
-        // Automatic Login (Admin Only for Now)
+        // Automatic Login
         window.addEventListener("load", async () => {
             try {
                 const userCredential = await auth.signInAnonymously();
@@ -111,7 +112,7 @@
                 loadCompletedTickets();
                 loadHotels();
             } catch (error) {
-                console.error("Anonymous login failed:", error);
+                console.error("Login failed:", error);
                 alert("Login failed: " + error.message);
             }
         });
@@ -163,7 +164,6 @@
                         completedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     loadTickets();
-                    loadCompletedTickets();
                 });
                 li.appendChild(completeButton);
                 ticketList.appendChild(li);
@@ -212,53 +212,44 @@
             e.preventDefault();
             const hotelName = document.getElementById("hotel-name").value;
             const hotelAddress = document.getElementById("hotel-address").value;
-            const hotelRoom = document.getElementById("hotel-room").value;
-
+            const roomAssignment = document.getElementById("room-assignment").value;
             try {
                 await db.collection("hotels").add({
                     name: hotelName,
                     address: hotelAddress,
-                    roomAssignment: hotelRoom,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    roomAssignment
                 });
                 loadHotels();
-                hotelForm.reset(); // Clear the form
+                hotelForm.reset();
             } catch (error) {
-                console.error("Error adding hotel:", error.message);
                 alert("Failed to add hotel: " + error.message);
             }
         });
 
         // Load Hotels
-       async function loadTickets() {
-    ticketList.innerHTML = "";
-    const querySnapshot = await db.collection("tickets").where("status", "==", "Open").get();
-    querySnapshot.forEach((doc) => {
-        const ticket = doc.data();
-        const name = ticket.name || "No Name Provided";
-        const address = ticket.address || "No Address Provided";
-        const description = ticket.description || "No Description Provided";
-        const etr = ticket.etr || "No ETR Provided";
-
-        const li = document.createElement("li");
-        li.className = "list-group-item d-flex justify-content-between align-items-center";
-        li.textContent = `${name} - ${address} - ${description} (ETR: ${etr})`;
-        const completeButton = document.createElement("button");
-        completeButton.className = "btn btn-sm btn-success";
-        completeButton.textContent = "Complete";
-        completeButton.addEventListener("click", async () => {
-            await db.collection("tickets").doc(doc.id).update({
-                status: "Completed",
-                completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        async function loadHotels() {
+            hotelList.innerHTML = "";
+            const querySnapshot = await db.collection("hotels").get();
+            querySnapshot.forEach((doc) => {
+                const hotel = doc.data();
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.textContent = `${hotel.name} - ${hotel.address} - Room: ${hotel.roomAssignment}`;
+                const googleMapsLink = document.createElement("a");
+                googleMapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.address)}`;
+                googleMapsLink.textContent = "Google Maps";
+                googleMapsLink.target = "_blank";
+                googleMapsLink.style.marginRight = "10px";
+                const appleMapsLink = document.createElement("a");
+                appleMapsLink.href = `https://maps.apple.com/?q=${encodeURIComponent(hotel.address)}`;
+                appleMapsLink.textContent = "Apple Maps";
+                appleMapsLink.target = "_blank";
+                li.appendChild(document.createElement("br"));
+                li.appendChild(googleMapsLink);
+                li.appendChild(appleMapsLink);
+                hotelList.appendChild(li);
             });
-            loadTickets();
-            loadCompletedTickets();
-        });
-        li.appendChild(completeButton);
-        ticketList.appendChild(li);
-    });
-}
-
+        }
     </script>
 </body>
 </html>
