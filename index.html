@@ -1,44 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storm Ticket Management</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Firebase SDKs -->
+    <title>Firebase Test</title>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
-    <link rel="icon" href="data:,">
 </head>
 <body>
-    <div class="container py-5">
-        <h1 class="text-center">Storm Ticket Management</h1>
-
-        <!-- Dashboard Section -->
-        <div id="dashboard-section" class="mt-5" style="display: none;">
-            <h3>User Dashboard</h3>
-            <button id="logout-button" class="btn btn-danger mb-3">Logout</button>
-
-            <h4>Create Ticket</h4>
-            <form id="ticket-form">
-                <div class="mb-3">
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="address" placeholder="Enter address">
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Work Description</label>
-                    <textarea class="form-control" id="description" rows="3" placeholder="Enter work description"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success">Add Ticket</button>
-            </form>
-
-            <h4 class="mt-5">Assigned Tickets</h4>
-            <ul id="ticket-list" class="list-group"></ul>
-        </div>
-    </div>
-
+    <h1>Testing Firebase</h1>
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -56,73 +25,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // HTML Elements
-        const dashboardSection = document.getElementById("dashboard-section");
-        const logoutButton = document.getElementById("logout-button");
-        const ticketForm = document.getElementById("ticket-form");
-        const ticketList = document.getElementById("ticket-list");
-
-        // Automatic Anonymous Login
-        window.addEventListener("load", async () => {
-            try {
-                const userCredential = await auth.signInAnonymously();
-                console.log("Logged in anonymously:", userCredential.user);
-                dashboardSection.style.display = "block";
-                loadTickets();
-            } catch (error) {
-                console.error("Anonymous login failed:", error);
-                alert("Login failed: " + error.message);
-            }
-        });
-
-        // Logout
-        logoutButton.addEventListener("click", () => {
-            auth.signOut();
-            location.reload(); // Refresh the page to trigger automatic login again
-        });
-
-        // Add Ticket
-        ticketForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const address = document.getElementById("address").value;
-            const description = document.getElementById("description").value;
-            try {
-                await db.collection("tickets").add({
-                    address,
-                    description,
-                    status: "Open",
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                loadTickets();
-                ticketForm.reset();
-            } catch (error) {
-                alert("Failed to add ticket: " + error.message);
-            }
-        });
-
-        // Load Tickets
-        async function loadTickets() {
-            ticketList.innerHTML = "";
-            const querySnapshot = await db.collection("tickets").get();
-            querySnapshot.forEach((doc) => {
-                const ticket = doc.data();
-                const li = document.createElement("li");
-                li.className = "list-group-item d-flex justify-content-between align-items-center";
-                li.textContent = `${ticket.address}: ${ticket.description}`;
-                const completeButton = document.createElement("button");
-                completeButton.className = "btn btn-sm btn-success";
-                completeButton.textContent = "Complete";
-                completeButton.addEventListener("click", async () => {
-                    await db.collection("tickets").doc(doc.id).update({
-                        status: "Completed",
-                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    loadTickets();
-                });
-                li.appendChild(completeButton);
-                ticketList.appendChild(li);
-            });
-        }
+        console.log("Firebase initialized successfully!");
     </script>
 </body>
 </html>
