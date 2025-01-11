@@ -53,6 +53,22 @@
             <ul id="completed-ticket-list" class="list-group"></ul>
 
             <!-- Hotel Management -->
+            <h4 class="mt-5">Add Hotel Details</h4>
+            <form id="hotel-form">
+                <div class="mb-3">
+                    <label for="hotel-name" class="form-label">Hotel Name</label>
+                    <input type="text" class="form-control" id="hotel-name" placeholder="Enter hotel name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="hotel-address" class="form-label">Hotel Address</label>
+                    <input type="text" class="form-control" id="hotel-address" placeholder="Enter hotel address" required>
+                </div>
+                <div class="mb-3">
+                    <label for="hotel-room" class="form-label">Room Assignment</label>
+                    <input type="text" class="form-control" id="hotel-room" placeholder="Enter room assignment" required>
+                </div>
+                <button type="submit" class="btn btn-success">Add Hotel</button>
+            </form>
             <h4 class="mt-5">Hotel Details</h4>
             <ul id="hotel-list" class="list-group"></ul>
         </div>
@@ -82,6 +98,7 @@
         const ticketList = document.getElementById("ticket-list");
         const completedTicketList = document.getElementById("completed-ticket-list");
         const downloadCompletedTicketsButton = document.getElementById("download-completed-tickets");
+        const hotelForm = document.getElementById("hotel-form");
         const hotelList = document.getElementById("hotel-list");
 
         // Automatic Login (Admin Only for Now)
@@ -146,6 +163,7 @@
                         completedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     loadTickets();
+                    loadCompletedTickets();
                 });
                 li.appendChild(completeButton);
                 ticketList.appendChild(li);
@@ -189,6 +207,28 @@
             document.body.removeChild(link);
         });
 
+        // Add Hotel
+        hotelForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const hotelName = document.getElementById("hotel-name").value;
+            const hotelAddress = document.getElementById("hotel-address").value;
+            const hotelRoom = document.getElementById("hotel-room").value;
+
+            try {
+                await db.collection("hotels").add({
+                    name: hotelName,
+                    address: hotelAddress,
+                    roomAssignment: hotelRoom,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                loadHotels();
+                hotelForm.reset(); // Clear the form
+            } catch (error) {
+                console.error("Error adding hotel:", error.message);
+                alert("Failed to add hotel: " + error.message);
+            }
+        });
+
         // Load Hotels
         async function loadHotels() {
             hotelList.innerHTML = "";
@@ -198,6 +238,8 @@
                 const li = document.createElement("li");
                 li.className = "list-group-item";
                 li.textContent = `${hotel.name} - ${hotel.address} - ${hotel.roomAssignment}`;
+
+                // Add map links
                 const googleMapsLink = document.createElement("a");
                 googleMapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.address)}`;
                 googleMapsLink.textContent = "Google Maps";
@@ -206,6 +248,8 @@
                 appleMapsLink.href = `https://maps.apple.com/?q=${encodeURIComponent(hotel.address)}`;
                 appleMapsLink.textContent = "Apple Maps";
                 appleMapsLink.target = "_blank";
+
+                li.appendChild(document.createTextNode(" "));
                 li.appendChild(googleMapsLink);
                 li.appendChild(document.createTextNode(" | "));
                 li.appendChild(appleMapsLink);
