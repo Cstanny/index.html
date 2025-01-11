@@ -100,29 +100,32 @@
             }
         });
 
-        // Load Tickets
-        async function loadTickets() {
-            ticketList.innerHTML = "";
-            const querySnapshot = await db.collection("tickets").get();
-            querySnapshot.forEach((doc) => {
-                const ticket = doc.data();
-                const li = document.createElement("li");
-                li.className = "list-group-item d-flex justify-content-between align-items-center";
-                li.textContent = `${ticket.address}: ${ticket.description}`;
-                const completeButton = document.createElement("button");
-                completeButton.className = "btn btn-sm btn-success";
-                completeButton.textContent = "Complete";
-                completeButton.addEventListener("click", async () => {
-                    await db.collection("tickets").doc(doc.id).update({
-                        status: "Completed",
-                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    loadTickets();
+       // Load Tickets
+async function loadTickets() {
+    ticketList.innerHTML = ""; // Clear the current list
+    const querySnapshot = await db.collection("tickets").get();
+    querySnapshot.forEach((doc) => {
+        const ticket = doc.data();
+        if (ticket.status !== "Completed") { // Only show tickets that are not completed
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.textContent = `${ticket.address}: ${ticket.description}`;
+            const completeButton = document.createElement("button");
+            completeButton.className = "btn btn-sm btn-success";
+            completeButton.textContent = "Complete";
+            completeButton.addEventListener("click", async () => {
+                await db.collection("tickets").doc(doc.id).update({
+                    status: "Completed",
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                li.appendChild(completeButton);
-                ticketList.appendChild(li);
+                loadTickets(); // Reload the tickets after updating
             });
+            li.appendChild(completeButton);
+            ticketList.appendChild(li);
         }
+    });
+}
+
     </script>
 </body>
 </html>
