@@ -14,61 +14,91 @@
 </head>
 <body>
     <div class="container py-5">
-        <h1 class="text-center">Storm Ticket Management</h1>
+        <!-- Top Navigation Banner -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" id="view-add-tab" href="#">View/Add Ticket</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="view-add-hotel-tab" href="#">View/Add Hotel Assignment</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logout-tab" href="#">Logout</a>
+            </li>
+        </ul>
 
-        <!-- Dashboard Section -->
-        <div id="dashboard-section" class="mt-5">
-            <h3>User Dashboard</h3>
-            <button id="logout-button" class="btn btn-danger mb-3">Logout</button>
+        <!-- View/Add Ticket Section -->
+        <div id="view-add-section" class="mt-4">
+            <h3 class="text-center">Manage Tickets</h3>
+            <div class="btn-group mb-4">
+                <button class="btn btn-primary" id="view-tickets-btn">View Tickets</button>
+                <button class="btn btn-success" id="add-tickets-btn">Add Ticket</button>
+            </div>
 
-            <!-- Ticket Creation -->
-            <h4>Create Ticket</h4>
-            <form id="ticket-form">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" placeholder="Enter assignee's name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" class="form-control" id="address" placeholder="Enter address" required>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Work Description</label>
-                    <textarea class="form-control" id="description" rows="3" placeholder="Enter work description" required></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="etr" class="form-label">ETR (Estimated Time of Restoration)</label>
-                    <input type="datetime-local" class="form-control" id="etr" required>
-                </div>
-                <button type="submit" class="btn btn-success">Add Ticket</button>
-            </form>
+            <!-- View Tickets Section -->
+            <div id="view-tickets-section" style="display: none;">
+                <h4>Open Tickets</h4>
+                <ul id="ticket-list" class="list-group"></ul>
+            </div>
 
-            <!-- Tickets -->
-            <h4 class="mt-5">Assigned Tickets</h4>
-            <ul id="ticket-list" class="list-group"></ul>
+            <!-- Add Tickets Section -->
+            <div id="add-tickets-section" style="display: none;">
+                <h4>Add Ticket</h4>
+                <form id="ticket-form">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter assignee's name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="address" placeholder="Enter address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Work Description</label>
+                        <textarea class="form-control" id="description" rows="3" placeholder="Enter work description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="etr" class="form-label">ETR (Estimated Time of Restoration)</label>
+                        <input type="datetime-local" class="form-control" id="etr" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Ticket</button>
+                </form>
+            </div>
+        </div>
 
-            <!-- Download Completed Tickets CSV -->
-            <h4 class="mt-5">Completed Tickets</h4>
-            <button id="download-completed-tickets" class="btn btn-primary mb-3">Download Completed Tickets (CSV)</button>
+        <!-- View/Add Hotel Assignment Section -->
+        <div id="view-add-hotel-section" class="mt-4" style="display: none;">
+            <h3 class="text-center">Manage Hotel Assignments</h3>
+            <div class="btn-group mb-4">
+                <button class="btn btn-primary" id="view-hotels-btn">View Hotel Assignments</button>
+                <button class="btn btn-success" id="add-hotels-btn">Add Hotel Assignment</button>
+            </div>
 
-            <!-- Hotel Management -->
-            <h4 class="mt-5">Hotel Details</h4>
-            <form id="hotel-form">
-                <div class="mb-3">
-                    <label for="hotel-name" class="form-label">Hotel Name</label>
-                    <input type="text" class="form-control" id="hotel-name" placeholder="Enter hotel name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="hotel-address" class="form-label">Hotel Address</label>
-                    <input type="text" class="form-control" id="hotel-address" placeholder="Enter hotel address" required>
-                </div>
-                <div class="mb-3">
-                    <label for="room-assignment" class="form-label">Room Assignment</label>
-                    <input type="text" class="form-control" id="room-assignment" placeholder="Enter room assignment" required>
-                </div>
-                <button type="submit" class="btn btn-success">Add Hotel</button>
-            </form>
-            <ul id="hotel-list" class="list-group mt-4"></ul>
+            <!-- View Hotel Assignments Section -->
+            <div id="view-hotels-section" style="display: none;">
+                <h4>Hotel Assignments</h4>
+                <ul id="hotel-list" class="list-group"></ul>
+            </div>
+
+            <!-- Add Hotel Assignments Section -->
+            <div id="add-hotels-section" style="display: none;">
+                <h4>Add Hotel Assignment</h4>
+                <form id="hotel-form">
+                    <div class="mb-3">
+                        <label for="hotel-name" class="form-label">Hotel Name</label>
+                        <input type="text" class="form-control" id="hotel-name" placeholder="Enter hotel name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hotel-address" class="form-label">Hotel Address</label>
+                        <input type="text" class="form-control" id="hotel-address" placeholder="Enter hotel address" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="room-assignment" class="form-label">Room Assignment</label>
+                        <input type="text" class="form-control" id="room-assignment" placeholder="Enter room assignment" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Hotel Assignment</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -86,106 +116,65 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
 
         // HTML Elements
-        const logoutButton = document.getElementById("logout-button");
-        const ticketForm = document.getElementById("ticket-form");
-        const ticketList = document.getElementById("ticket-list");
-        const downloadCompletedTicketsButton = document.getElementById("download-completed-tickets");
+        const viewHotelsSection = document.getElementById("view-hotels-section");
+        const addHotelsSection = document.getElementById("add-hotels-section");
         const hotelForm = document.getElementById("hotel-form");
         const hotelList = document.getElementById("hotel-list");
+        const viewHotelsBtn = document.getElementById("view-hotels-btn");
+        const addHotelsBtn = document.getElementById("add-hotels-btn");
 
-        // Automatic Login
-        window.addEventListener("load", async () => {
-            try {
-                const userCredential = await auth.signInAnonymously();
-                console.log("Logged in anonymously:", userCredential.user);
-                loadTickets();
-                loadHotels();
-            } catch (error) {
-                console.error("Anonymous login failed:", error);
-                alert("Login failed: " + error.message);
-            }
+        // Navigation Tabs
+        document.getElementById("view-add-tab").addEventListener("click", () => {
+            document.getElementById("view-add-section").style.display = "block";
+            document.getElementById("view-add-hotel-section").style.display = "none";
         });
 
-        // Logout
-        logoutButton.addEventListener("click", () => {
-            auth.signOut();
+        document.getElementById("view-add-hotel-tab").addEventListener("click", () => {
+            document.getElementById("view-add-section").style.display = "none";
+            document.getElementById("view-add-hotel-section").style.display = "block";
+        });
+
+        document.getElementById("logout-tab").addEventListener("click", () => {
             location.reload();
         });
 
-        // Add Ticket
-        ticketForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const name = document.getElementById("name").value;
-            const address = document.getElementById("address").value;
-            const description = document.getElementById("description").value;
-            const etr = document.getElementById("etr").value;
-            try {
-                await db.collection("tickets").add({
-                    name,
-                    address,
-                    description,
-                    etr,
-                    status: "Open",
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                loadTickets();
-                ticketForm.reset();
-            } catch (error) {
-                alert("Failed to add ticket: " + error.message);
-            }
+        // Show View Hotel Assignments Section
+        viewHotelsBtn.addEventListener("click", async () => {
+            viewHotelsSection.style.display = "block";
+            addHotelsSection.style.display = "none";
+            loadHotels();
         });
 
-        // Load Tickets
-        async function loadTickets() {
-            ticketList.innerHTML = "";
-            const querySnapshot = await db.collection("tickets").where("status", "==", "Open").get();
-            querySnapshot.forEach((doc) => {
-                const ticket = doc.data();
-                const li = document.createElement("li");
-                li.className = "list-group-item d-flex justify-content-between align-items-center";
-                li.innerHTML = `${ticket.name} - ${ticket.address} - ${ticket.description} (ETR: ${ticket.etr})`;
-                const googleMapsLink = `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ticket.address)}" target="_blank">Google Maps</a>`;
-                const appleMapsLink = `<a href="https://maps.apple.com/?q=${encodeURIComponent(ticket.address)}" target="_blank">Apple Maps</a>`;
-                li.innerHTML += ` | ${googleMapsLink} | ${appleMapsLink}`;
-                const completeButton = document.createElement("button");
-                completeButton.className = "btn btn-sm btn-success";
-                completeButton.textContent = "Complete";
-                completeButton.addEventListener("click", async () => {
-                    await db.collection("tickets").doc(doc.id).update({
-                        status: "Completed",
-                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    loadTickets();
-                });
-                li.appendChild(completeButton);
-                ticketList.appendChild(li);
-            });
-        }
+        // Show Add Hotel Assignments Section
+        addHotelsBtn.addEventListener("click", () => {
+            viewHotelsSection.style.display = "none";
+            addHotelsSection.style.display = "block";
+        });
 
-        // Add Hotel
+        // Add Hotel Assignment
         hotelForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const name = document.getElementById("hotel-name").value;
-            const address = document.getElementById("hotel-address").value;
-            const room = document.getElementById("room-assignment").value;
+            const hotelName = document.getElementById("hotel-name").value;
+            const hotelAddress = document.getElementById("hotel-address").value;
+            const roomAssignment = document.getElementById("room-assignment").value;
             try {
                 await db.collection("hotels").add({
-                    name,
-                    address,
-                    room
+                    hotelName,
+                    hotelAddress,
+                    roomAssignment,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                loadHotels();
+                alert("Hotel assignment added successfully!");
                 hotelForm.reset();
             } catch (error) {
-                alert("Failed to add hotel: " + error.message);
+                alert("Failed to add hotel assignment: " + error.message);
             }
         });
 
-        // Load Hotels
+        // Load Hotel Assignments
         async function loadHotels() {
             hotelList.innerHTML = "";
             const querySnapshot = await db.collection("hotels").get();
@@ -193,37 +182,13 @@
                 const hotel = doc.data();
                 const li = document.createElement("li");
                 li.className = "list-group-item";
-                li.innerHTML = `${hotel.name} - ${hotel.address} - Room: ${hotel.room}`;
-                const googleMapsLink = `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.address)}" target="_blank">Google Maps</a>`;
-                const appleMapsLink = `<a href="https://maps.apple.com/?q=${encodeURIComponent(hotel.address)}" target="_blank">Apple Maps</a>`;
+                li.innerHTML = `${hotel.hotelName} - ${hotel.hotelAddress} - Room: ${hotel.roomAssignment}`;
+                const googleMapsLink = `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelAddress)}" target="_blank">Google Maps</a>`;
+                const appleMapsLink = `<a href="https://maps.apple.com/?q=${encodeURIComponent(hotel.hotelAddress)}" target="_blank">Apple Maps</a>`;
                 li.innerHTML += ` | ${googleMapsLink} | ${appleMapsLink}`;
                 hotelList.appendChild(li);
             });
         }
-
-        // Download Completed Tickets as CSV
-        downloadCompletedTicketsButton.addEventListener("click", async () => {
-            const querySnapshot = await db.collection("tickets").where("status", "==", "Completed").get();
-            const tickets = [];
-            querySnapshot.forEach((doc) => {
-                const ticket = doc.data();
-                tickets.push({
-                    name: ticket.name,
-                    address: ticket.address,
-                    description: ticket.description,
-                    completedAt: ticket.completedAt?.toDate()
-                });
-            });
-            const csvContent = "data:text/csv;charset=utf-8," +
-                tickets.map(ticket => Object.values(ticket).join(",")).join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "completed_tickets.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
     </script>
 </body>
 </html>
